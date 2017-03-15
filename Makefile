@@ -7,10 +7,11 @@ SOURCES=\
   src/mem.asm \
   src/menu.asm
 
-all: crates.rom
+all: build/rom/crates.rom
 
-crates.rom: ${SOURCES} src/main.asm
-	pasmo ${INCLUDES} src/main.asm crates.rom
+build/rom/crates.rom: ${SOURCES} src/main.asm
+	mkdir -p build/rom
+	pasmo ${INCLUDES} src/main.asm build/rom/crates.rom
 
 .PHONY clean:
-	rm -f *.rom *.bin
+	rm -rf build
