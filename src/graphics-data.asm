@@ -2,7 +2,7 @@
 ; File        : graphics-data.asm
 ; Description : Data definitions for char patterns & colors
 ;
-; Copyright (C) 2015 Alvaro Polo
+; Copyright (C) 2015-2017 Alvaro Polo
 ;
 ; This Source Code Form is subject to the terms of the Mozilla Public
 ; License, v. 2.0. If a copy of the MPL was not distributed with this
