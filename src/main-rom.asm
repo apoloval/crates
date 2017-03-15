@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------------;
-; File        : rom.asm
+; File        : main-rom.asm
 ; Description : A wrapper to generate a .rom file loadable as cartridge
 ;
 ; Copyright (C) 2015-2017 Alvaro Polo

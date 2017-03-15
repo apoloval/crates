@@ -9,9 +9,9 @@ SOURCES=\
 
 all: build/rom/crates.rom
 
-build/rom/crates.rom: ${SOURCES} src/main.asm
+build/rom/crates.rom: ${SOURCES} src/main-rom.asm
 	mkdir -p build/rom
-	pasmo ${INCLUDES} src/main.asm build/rom/crates.rom
+	pasmo ${INCLUDES} src/main-rom.asm build/rom/crates.rom
 
 .PHONY clean:
 	rm -rf build
