@@ -81,28 +81,25 @@ endp
 ; --------------------------------------------------------------------------- ;
 proc
 display_menu:
-	local title, title_len
-	local start, start_len
-	local enter_level, enter_level_len
-	local redefine, redefine_len
+	local title, opt1, opt2, opt3
 
 	ld	hl, title
-	ld	a, title_len
+	ld	a, 0
 	ld	bc, 0x0c04
 	call	print_string
 
-	ld	hl, start
-	ld	a, start_len
+	ld	hl, opt1
+	ld	a, 0
 	ld	bc, 0x0607
 	call	print_string
 
-	ld	hl, enter_level
-	ld	a, enter_level_len
+	ld	hl, opt2
+	ld	a, 0
 	ld	bc, 0x0608
 	call	print_string
 
-	ld	hl, redefine
-	ld	a, redefine_len
+	ld	hl, opt3
+	ld	a, 0
 	ld	bc, 0x0609
 	call	print_string
 
@@ -131,14 +128,10 @@ display_menu:
 
 	ret
 
-	title db "CRATES!"
-	title_len equ 7
-	start db "1 START"
-	start_len equ 7
-	enter_level db "2 ENTER LEVEL CODE"
-	enter_level_len equ 18
-	redefine db "3 REDEFINE KEYS"
-	redefine_len equ 15
+title: 	db "CRATES!", 0
+opt1: 	db "1 START", 0
+opt2:	db "2 ENTER LEVEL CODE", 0
+opt3: 	db "3 REDEFINE KEYS", 0
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -150,8 +143,7 @@ endp
 proc
 display_main_menu_msg:
 	local switch, case_0, case_1, break
-	local select_opt, select_opt_len
-	local enter_left, enter_left_len
+	local select_opt, enter_left
 	sla a
 	ld	hl, switch
 	ld	b, 0
@@ -165,11 +157,11 @@ switch:
 
 case_0:
 	ld	hl, select_opt
-	ld	a, select_opt_len
+	ld	a, 0
 	jr	break
 case_1:
 	ld	hl, enter_left
-	ld	a, enter_left_len
+	ld	a, 0
 	jr	break
 
 break:
@@ -178,23 +170,42 @@ break:
 
 	ret
 
-select_opt       db "SELECT AN OPTION"
-select_opt_len   equ 16
-enter_left       db "ENTER MOVE LEFT KEY"
-enter_left_len   equ 19
-
+select_opt:
+	db "SELECT AN OPTION", 0
+enter_left:
+	db "ENTER MOVE LEFT KEY", 0
 endp
 
 ; --------------------------------------------------------------------------- ;
 ; Display the given string at given location
-; (in) hl: the location of the string in memory
-; (in)  a: the length of the string
-; (in)  b: the column where string is printed
-; (in)  c: the row where string is printed
+; (in) hl	the location of the string in memory
+; (in) a	the length of the string, or calculate it if zero
+; (in) b	the column where string is printed
+; (in) c	the row where string is printed
 ; (regs) all
 ; --------------------------------------------------------------------------- ;
 proc
 print_string:
+	local len_ready, loop, end_loop
+; Calculate the length of the string if zero
+	and	a
+	jr	nz, len_ready
+	push	hl
+	push	bc
+	ld	b, 0
+loop:
+	ld	a, (hl)
+	and	a
+	jr	z, end_loop
+	inc	hl
+	inc	b
+	jr	loop
+end_loop:
+	ld	a, b
+	pop	bc
+	pop	hl
+
+len_ready:
 	push	hl
 	ld	h, 0
 	ld	l, a
@@ -291,9 +302,9 @@ endp
 
 ; --------------------------------------------------------------------------- ;
 ; Compute the memory offset in a buffer for a column and row tuple
-; (in) b: the column coordinate
-; (in) c: the row coordinate
-; (out) hl: the buffer offset
+; (in) b	the column coordinate
+; (in) c	the row coordinate
+; (out) hl	the buffer offset
 ; (regs) all
 ; --------------------------------------------------------------------------- ;
 proc
