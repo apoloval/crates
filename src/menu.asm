@@ -15,20 +15,22 @@
 ;-----------------------------------------------------------------------------;
 proc
 run_menu:
-  call display_menu
-_sel_opt:
-  call scan_key_pressed
-  jr z, _sel_opt
-  cp 1
-  ret z
-  cp 2
-  ret z
-  cp 3
-  jr z, _redefine_keys
-  jr _sel_opt
-_redefine_keys:
-  ld a, 1
-  call display_main_menu_msg
+	local sel_opt, redefine_keys
 
-  jr _sel_opt
+	call	display_menu
+sel_opt:
+	call	scan_key_pressed
+	jr	z, sel_opt
+	cp	1
+	ret	z
+	cp	2
+	ret	z
+	cp	3
+	jr	z, redefine_keys
+	jr	sel_opt
+redefine_keys:
+	ld	a, 1
+	call	display_main_menu_msg
+
+	jr	sel_opt
 endp

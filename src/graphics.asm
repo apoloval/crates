@@ -81,23 +81,28 @@ endp
 ; --------------------------------------------------------------------------- ;
 proc
 display_menu:
-	ld	hl, _title
-	ld	a, _title_len
+	local title, title_len
+	local start, start_len
+	local enter_level, enter_level_len
+	local redefine, redefine_len
+
+	ld	hl, title
+	ld	a, title_len
 	ld	bc, 0x0c04
 	call	print_string
 
-	ld	hl, _start
-	ld	a, _start_len
+	ld	hl, start
+	ld	a, start_len
 	ld	bc, 0x0607
 	call	print_string
 
-	ld	hl, _enter_level
-	ld	a, _enter_level_len
+	ld	hl, enter_level
+	ld	a, enter_level_len
 	ld	bc, 0x0608
 	call	print_string
 
-	ld	hl, _redefine
-	ld	a, _redefine_len
+	ld	hl, redefine
+	ld	a, redefine_len
 	ld	bc, 0x0609
 	call	print_string
 
@@ -126,14 +131,14 @@ display_menu:
 
 	ret
 
-	_title db "CRATES!"
-	_title_len equ 7
-	_start db "1 START"
-	_start_len equ 7
-	_enter_level db "2 ENTER LEVEL CODE"
-	_enter_level_len equ 18
-	_redefine db "3 REDEFINE KEYS"
-	_redefine_len equ 15
+	title db "CRATES!"
+	title_len equ 7
+	start db "1 START"
+	start_len equ 7
+	enter_level db "2 ENTER LEVEL CODE"
+	enter_level_len equ 18
+	redefine db "3 REDEFINE KEYS"
+	redefine_len equ 15
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -144,36 +149,40 @@ endp
 ; --------------------------------------------------------------------------- ;
 proc
 display_main_menu_msg:
+	local switch, case_0, case_1, break
+	local select_opt, select_opt_len
+	local enter_left, enter_left_len
 	sla a
-	ld	hl, _switch
+	ld	hl, switch
 	ld	b, 0
 	ld	c, a
 	add	hl, bc
 	jp	(hl)
 
-_switch:
-	jr	_case_0
-	jr	_case_1
+switch:
+	jr	case_0
+	jr	case_1
 
-_case_0:
-	ld	hl, _select_opt
-	ld	a, _select_opt_len
-	jr	_break
-_case_1:
-	ld	hl, _enter_left
-	ld	a, _enter_left_len
-	jr	_break
+case_0:
+	ld	hl, select_opt
+	ld	a, select_opt_len
+	jr	break
+case_1:
+	ld	hl, enter_left
+	ld	a, enter_left_len
+	jr	break
 
-_break:
+break:
 	ld	bc, 0x0611
 	call	print_string
 
 	ret
 
-_select_opt       db "SELECT AN OPTION"
-_select_opt_len   equ 16
-_enter_left       db "ENTER MOVE LEFT KEY"
-_enter_left_len   equ 19
+select_opt       db "SELECT AN OPTION"
+select_opt_len   equ 16
+enter_left       db "ENTER MOVE LEFT KEY"
+enter_left_len   equ 19
+
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -242,7 +251,8 @@ endp
 ; --------------------------------------------------------------------------- ;
 proc
 print_brick_hline:
-_loop_bricks:
+	local loop
+loop:
 	ld	b, a
 	ld	c, e
 	push	af
@@ -253,7 +263,7 @@ _loop_bricks:
 	cp	d
 	ret	z
 	sub	2
-	jr	_loop_bricks
+	jr	loop
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -264,7 +274,8 @@ endp
 ; --------------------------------------------------------------------------- ;
 proc
 print_brick_vline:
-_loop:
+	local loop
+loop:
 	ld	b, d
 	ld	c, a
 	push	af
@@ -275,7 +286,7 @@ _loop:
 	cp	e
 	ret	z
 	sub	2
-	jr	_loop
+	jr	loop
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -287,11 +298,12 @@ endp
 ; --------------------------------------------------------------------------- ;
 proc
 buffer_offset:
+	local calc_row, row_done
 	ld	hl, 0
-_calc_row:
+calc_row:
 	xor	a
 	or c
-	jr	z, _row_done
+	jr	z, row_done
 	ld	a, l
 	add	a, 32
 	ld	l, a
@@ -299,8 +311,8 @@ _calc_row:
 	adc	a, 0
 	ld	h, a
 	dec	c
-	jr	_calc_row
-_row_done:
+	jr	calc_row
+row_done:
 	ld	c, b
 	ld	b, 0
 	add	hl, bc
