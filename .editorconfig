@@ -1,0 +1,6 @@
+[*]
+insert_final_newline = true
+
+[*.asm]
+indent_style = tabs
+indent_size = 8
