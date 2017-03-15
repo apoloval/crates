@@ -10,8 +10,7 @@
 ;
 ;-----------------------------------------------------------------------------;
 
-STACK_BASE          equ 0xf380
-KEYS_LEFT           equ 0xc000
-KEYS_RIGHT          equ 0xc001
-KEYS_UP             equ 0xc002
-KEYS_DOWN           equ 0xc003
+KEYS_LEFT	equ HEAP_BASE_ADDR + 0
+KEYS_RIGHT	equ HEAP_BASE_ADDR + 1
+KEYS_UP 	equ HEAP_BASE_ADDR + 2
+KEYS_DOWN	equ HEAP_BASE_ADDR + 3
