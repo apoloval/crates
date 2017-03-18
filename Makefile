@@ -14,6 +14,10 @@ DISK_TARGETS=\
 ALL_TARGETS=\
 	${ROM_TARGETS} \
 	${DISK_TARGETS}
+ALL_SYMS=\
+	build/disk/crates.sym \
+	build/disk/crates_openmsx.sym \
+	build/rom/crates_openmsx.sym
 
 # Some definitions for ROM version
 HEAP_BASE_ADDR=0xc000
@@ -25,6 +29,8 @@ SCREEN_BASE_ADDR=0x8400
 MAIN_BASE_ADDR=0x8900
 
 all: ${ALL_TARGETS}
+
+sym: ${ALL_SYMS}
 
 build/rom/crates.rom: ${SOURCES} src/rom/main.asm
 	mkdir -p build/rom
@@ -46,7 +52,7 @@ build/disk/crates.scr: ${SOURCES} src/disk/screen.asm
 		-E HEAP_BASE_ADDR=${HEAP_BASE_ADDR} \
 		src/disk/screen.asm \
 		build/disk/crates.scr \
-		build/disk/crates.sym
+		build/disk/crates.scr.sym
 
 build/disk/crates0.bin: ${SOURCES} src/disk/main.asm
 	mkdir -p build/disk
@@ -55,7 +61,16 @@ build/disk/crates0.bin: ${SOURCES} src/disk/main.asm
 		-E HEAP_BASE_ADDR=${HEAP_BASE_ADDR} \
 		src/disk/main.asm \
 		build/disk/crates0.bin \
-		build/disk/crates0.sym
+		build/disk/crates0.bin.sym
+
+build/disk/crates0.bin.sym: build/disk/crates0.bin
+build/disk/crates.scr.sym: build/disk/crates.scr
+build/rom/crates.sym: build/rom/crates.rom
+build/disk/crates.sym: build/disk/crates0.bin.sym build/disk/crates.scr.sym
+	cat $^ > $@
+
+%_openmsx.sym: %.sym
+	awk '{ print $$1 ": " $$2 " " $$3}' $< | sed 's/H$$/h/g' | sed 's/EQU/equ/g' > $@
 
 .PHONY clean:
 	rm -rf build
