@@ -33,34 +33,38 @@ proc
 load_graphics:
 	call	DISSCR
 
-; Fill the char table
-	ld	hl, crates_char_patterns
+; Fill the char table, bank 0
+	ld	hl, BANK_PATTERN_0
 	ld	de, CHRTBL
 	ld	bc, 32*8*8
 	call	LDIRVM
 
-	ld	hl, crates_char_patterns
+; Now the bank 1
+	ld	hl, BANK_PATTERN_1
 	ld	de, CHRTBL+32*8*8
 	ld	bc, 32*8*8
 	call	LDIRVM
 
-	ld	hl, crates_char_patterns
+; And finally the bank 2
+	ld	hl, BANK_PATTERN_2
 	ld	de, CHRTBL+32*8*8*2
 	ld	bc, 32*8*8
 	call	LDIRVM
 
-; Fill the color table
-	ld	hl, crates_char_colors
+; Fill the color table, bank 0
+	ld	hl, BANK_COLOR_0
 	ld	de, CLRTBL
 	ld	bc, 32*8*8
 	call	LDIRVM
 
-	ld	hl, crates_char_colors
+; Now the bank 1
+	ld	hl, BANK_COLOR_1
 	ld	de, CLRTBL+32*8*8
 	ld	bc, 32*8*8
 	call	LDIRVM
 
-	ld	hl, crates_char_colors
+; Now the bank 2
+	ld	hl, BANK_COLOR_2
 	ld	de, CLRTBL+32*8*8*2
 	ld	bc, 32*8*8
 	call	LDIRVM
@@ -304,7 +308,7 @@ row_done:
 	ret
 endp
 
-TILE_BRICK0 equ 0x04
-TILE_BRICK1 equ 0x05
-TILE_BRICK2 equ 0x06
-TILE_BRICK3 equ 0x07
+TILE_BRICK0 equ 0x01
+TILE_BRICK1 equ 0x02
+TILE_BRICK2 equ 0x03
+TILE_BRICK3 equ 0x04
