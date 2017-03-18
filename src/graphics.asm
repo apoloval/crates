@@ -84,22 +84,18 @@ display_menu:
 	local title, opt1, opt2, opt3
 
 	ld	hl, title
-	ld	a, 0
 	ld	bc, 0x0c04
 	call	print_string
 
 	ld	hl, opt1
-	ld	a, 0
 	ld	bc, 0x0607
 	call	print_string
 
 	ld	hl, opt2
-	ld	a, 0
 	ld	bc, 0x0608
 	call	print_string
 
 	ld	hl, opt3
-	ld	a, 0
 	ld	bc, 0x0609
 	call	print_string
 
@@ -128,10 +124,10 @@ display_menu:
 
 	ret
 
-title: 	db "CRATES!", 0
-opt1: 	db "1 START", 0
-opt2:	db "2 ENTER LEVEL CODE", 0
-opt3: 	db "3 REDEFINE KEYS", 0
+title: 	db 7, "CRATES!"
+opt1: 	db 7, "1 START"
+opt2:	db 18, "2 ENTER LEVEL CODE"
+opt3: 	db 15, "3 REDEFINE KEYS"
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -144,7 +140,7 @@ proc
 display_main_menu_msg:
 	local switch, case_0, case_1, break
 	local select_opt, enter_left
-	sla a
+	sla	a
 	ld	hl, switch
 	ld	b, 0
 	ld	c, a
@@ -157,11 +153,9 @@ switch:
 
 case_0:
 	ld	hl, select_opt
-	ld	a, 0
 	jr	break
 case_1:
 	ld	hl, enter_left
-	ld	a, 0
 	jr	break
 
 break:
@@ -171,41 +165,22 @@ break:
 	ret
 
 select_opt:
-	db "SELECT AN OPTION", 0
+	db 16, "SELECT AN OPTION"
 enter_left:
-	db "ENTER MOVE LEFT KEY", 0
+	db 19, "ENTER MOVE LEFT KEY"
 endp
 
 ; --------------------------------------------------------------------------- ;
-; Display the given string at given location
-; (in) hl	the location of the string in memory
-; (in) a	the length of the string, or calculate it if zero
+; Display the given size-prefixed string at given location
+; (in) hl	the memory location of the size-prefixed string
 ; (in) b	the column where string is printed
 ; (in) c	the row where string is printed
 ; (regs) all
 ; --------------------------------------------------------------------------- ;
 proc
 print_string:
-	local len_ready, loop, end_loop
-; Calculate the length of the string if zero
-	and	a
-	jr	nz, len_ready
-	push	hl
-	push	bc
-	ld	b, 0
-loop:
 	ld	a, (hl)
-	and	a
-	jr	z, end_loop
 	inc	hl
-	inc	b
-	jr	loop
-end_loop:
-	ld	a, b
-	pop	bc
-	pop	hl
-
-len_ready:
 	push	hl
 	ld	h, 0
 	ld	l, a
@@ -215,8 +190,7 @@ len_ready:
 	ld	bc, NAMTBL
 	add	hl, bc
 
-	ld	d, h
-	ld	e, l
+	ex	de, hl
 	pop	bc
 	pop	hl
 	call	LDIRVM
