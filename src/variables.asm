@@ -11,6 +11,6 @@
 ;-----------------------------------------------------------------------------;
 
 KEYS_LEFT	equ HEAP_BASE_ADDR + 0
-KEYS_RIGHT	equ HEAP_BASE_ADDR + 2
-KEYS_UP 	equ HEAP_BASE_ADDR + 4
-KEYS_DOWN	equ HEAP_BASE_ADDR + 6
+KEYS_RIGHT	equ HEAP_BASE_ADDR + 1
+KEYS_UP 	equ HEAP_BASE_ADDR + 2
+KEYS_DOWN	equ HEAP_BASE_ADDR + 3

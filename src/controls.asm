@@ -15,20 +15,24 @@
 ;-----------------------------------------------------------------------------;
 proc
 init_keys:
-	ld	hl, DEFAULT_LEFT_KEY
-	ld	[KEYS_LEFT], hl
-	ld	hl, DEFAULT_RIGHT_KEY
-	ld	[KEYS_RIGHT], hl
-	ld	hl, DEFAULT_UP_KEY
-	ld	[KEYS_UP], hl
-	ld	hl, DEFAULT_DOWN_KEY
-	ld	[KEYS_DOWN], hl
+	ld	a, DEFAULT_LEFT_KEY
+	ld	(KEYS_LEFT), a
+	ld	a, DEFAULT_RIGHT_KEY
+	ld	(KEYS_RIGHT), a
+	ld	a, DEFAULT_UP_KEY
+	ld	(KEYS_UP), a
+	ld	a, DEFAULT_DOWN_KEY
+	ld	(KEYS_DOWN), a
 	ret
 
-DEFAULT_LEFT_KEY    dw 0x0404 ; 'O'
-DEFAULT_RIGHT_KEY   dw 0x0405 ; 'P'
-DEFAULT_UP_KEY      dw 0x0406 ; 'Q'
-DEFAULT_DOWN_KEY    dw 0x0206 ; 'A'
+DEFAULT_LEFT_KEY:
+	db 0x24 ; 'O'
+DEFAULT_RIGHT_KEY:
+	db 0x25 ; 'P'
+DEFAULT_UP_KEY:
+	db 0x26 ; 'Q'
+DEFAULT_DOWN_KEY:
+	db 0x16 ; 'A'
 endp
 
 ;-----------------------------------------------------------------------------;
@@ -60,10 +64,10 @@ row_found:
 	ei
 ; return if no key was pressed
 	ret	z
-; invert all bits in a
-	xor	0xff
+	xor	0xff ; invert all bits in A
+
+; put row in A and column bits in B
 	ld	b, a
-; a is row, b is column bits
 	ld	a, c
 ; multiply row by 8 to obtain base scancode
 	sla	a

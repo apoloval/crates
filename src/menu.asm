@@ -15,12 +15,15 @@
 ;-----------------------------------------------------------------------------;
 proc
 run_menu:
-	local sel_opt, redefine_keys
+	local show_opts, sel_opt, goto_opt3
+	local title, opt1, opt2, opt3
 
 	call	display_menu
 
-sel_opt:
+show_opts:
 ; Show the main menu options
+	call	clear_options
+
 	ld	hl, title
 	ld	bc, 0x0c08
 	call	print_string
@@ -34,6 +37,7 @@ sel_opt:
 	ld	bc, 0x060c
 	call	print_string
 
+sel_opt:
 ; Select an option from the main menu
 	call	scan_key_pressed
 	jr	z, sel_opt
@@ -42,32 +46,93 @@ sel_opt:
 	cp	2
 	jr	z, sel_opt
 	cp	3
-	jr	z, redefine_keys
+	jr	z, goto_opt3
 	jr	sel_opt
-redefine_keys:
-	call	display_menu
 
-	ld	hl, opt3_title
-	ld	bc, 0x0608
-	call	print_string
-
-	ld	hl, enter_left
-	ld	bc, 0x060a
-	call	print_string
-
-	ld	bc, 1000
-	call	wait_millis
-
-	jr	run_menu
+goto_opt3:
+	call	redefine_keys
+	jr	show_opts
 
 title: 	db 07, "CRATES!"
 opt1: 	db 07, "1 START"
 opt2:	db 18, "2 ENTER LEVEL CODE"
 opt3: 	db 15, "3 REDEFINE KEYS"
-opt3_title:
-	db 13, "REDEFINE KEYS"
+endp
+
+; --------------------------------------------------------------------------- ;
+; Execute the Redefine Keys option
+; --------------------------------------------------------------------------- ;
+proc
+redefine_keys:
+	local title, enter_left
+; Wait some time to avoid key bounces from main menu
+	ld	bc, 100
+	call	wait_millis
+
+	call	clear_options
+	ld	hl, title
+	ld	bc, 0x0908
+	call	print_string
+
+; Read the left key
+	ld	hl, enter_left_msg
+	ld	bc, 0x060a
+	call	print_string
 enter_left:
-	db 19, "ENTER MOVE LEFT KEY"
+	call	scan_key_pressed
+	jr	z, enter_left
+	ld	(KEYS_LEFT), a
+
+	ld	bc, 1000
+	call	wait_millis
+
+; Read the right key
+	ld	hl, enter_right_msg
+	ld	bc, 0x060a
+	call	print_string
+enter_right:
+	call	scan_key_pressed
+	jr	z, enter_right
+	ld	(KEYS_RIGHT), a
+
+	ld	bc, 1000
+	call	wait_millis
+
+; Read the up key
+	ld	hl, enter_up_msg
+	ld	bc, 0x060a
+	call	print_string
+enter_up:
+	call	scan_key_pressed
+	jr	z, enter_up
+	ld	(KEYS_UP), a
+
+	ld	bc, 1000
+	call	wait_millis
+
+; Read the down key
+	ld	hl, enter_down_msg
+	ld	bc, 0x060a
+	call	print_string
+enter_down:
+	call	scan_key_pressed
+	jr	z, enter_down
+	ld	(KEYS_DOWN), a
+
+	ld	bc, 1000
+	call	wait_millis
+
+	ret
+title:
+	db 13, "REDEFINE KEYS"
+enter_left_msg:
+	db 20, "ENTER MOVE LEFT KEY "
+enter_right_msg:
+	db 20, "ENTER MOVE RIGHT KEY"
+enter_up_msg:
+	db 20, "ENTER MOVE UP KEY   "
+enter_down_msg:
+	db 20, "ENTER MOVE DOWN KEY "
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -93,5 +158,25 @@ display_menu:
 	ld	a, 22
 	call	print_brick_vline
 
+	ret
+endp
+
+; --------------------------------------------------------------------------- ;
+; Clear the lines of text where menu text is shown
+; --------------------------------------------------------------------------- ;
+proc
+clear_options:
+	ld	a, 28
+	ld	bc, 0x0208
+	call	clear_line
+	ld	a, 28
+	ld	bc, 0x020a
+	call	clear_line
+	ld	a, 28
+	ld	bc, 0x020b
+	call	clear_line
+	ld	a, 28
+	ld	bc, 0x020c
+	call	clear_line
 	ret
 endp
