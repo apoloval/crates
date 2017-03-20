@@ -140,6 +140,49 @@ clear_line:
 	ret
 endp
 
+
+;-----------------------------------------------------------------------------;
+; Print the scancode symbol in screen
+; (in) A	the scan code to be printed
+; (in) B	the column where symbol will be printed
+; (in) C	the row where symbol will be printed
+; (regs) all
+;-----------------------------------------------------------------------------;
+proc
+print_scancode:
+	local symbols
+; Calculate the offset in `symbols` for the scan code and push
+	ld	hl, symbols
+	ld	d, 0
+	ld	e, a
+	add	hl, de
+	push	hl
+
+	call	buffer_offset
+	ld	de, NAMTBL
+	add	hl, de
+	ex	de, hl
+
+	ld	bc, 1
+	pop	hl
+	call	LDIRVM
+
+	ret
+symbols:
+	db "01234567"
+	db "89??????"
+	db "??????AB"
+	db "CDEFGHIJ"
+	db "KLMNOPQR"
+	db "STUVWXYZ"
+	db "????????"
+	db "????????"
+	db "????????"
+	db "????????"
+	db "????????"
+endp
+
+
 ; --------------------------------------------------------------------------- ;
 ; Print bricks in the given location
 ; (in)  b: the column where brick is printed

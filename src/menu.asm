@@ -82,6 +82,8 @@ enter_left:
 	call	scan_key_pressed
 	jr	z, enter_left
 	ld	(KEYS_LEFT), a
+	ld	bc, 0x150a
+	call	print_scancode
 
 	ld	bc, 1000
 	call	wait_millis
@@ -94,6 +96,8 @@ enter_right:
 	call	scan_key_pressed
 	jr	z, enter_right
 	ld	(KEYS_RIGHT), a
+	ld	bc, 0x160a
+	call	print_scancode
 
 	ld	bc, 1000
 	call	wait_millis
@@ -106,6 +110,8 @@ enter_up:
 	call	scan_key_pressed
 	jr	z, enter_up
 	ld	(KEYS_UP), a
+	ld	bc, 0x130a
+	call	print_scancode
 
 	ld	bc, 1000
 	call	wait_millis
@@ -118,6 +124,8 @@ enter_down:
 	call	scan_key_pressed
 	jr	z, enter_down
 	ld	(KEYS_DOWN), a
+	ld	bc, 0x150a
+	call	print_scancode
 
 	ld	bc, 1000
 	call	wait_millis
@@ -126,13 +134,13 @@ enter_down:
 title:
 	db 13, "REDEFINE KEYS"
 enter_left_msg:
-	db 20, "ENTER MOVE LEFT KEY "
+	db 17, "MOVE LEFT KEY:   "
 enter_right_msg:
-	db 20, "ENTER MOVE RIGHT KEY"
+	db 17, "MOVE RIGHT KEY:  "
 enter_up_msg:
-	db 20, "ENTER MOVE UP KEY   "
+	db 17, "MOVE UP KEY:     "
 enter_down_msg:
-	db 20, "ENTER MOVE DOWN KEY "
+	db 17, "MOVE DOWN KEY:   "
 endp
 
 ; --------------------------------------------------------------------------- ;
