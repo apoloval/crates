@@ -287,21 +287,18 @@ endp
 ; --------------------------------------------------------------------------- ;
 proc
 buffer_offset:
-	local calc_row, row_done
+; Put C in HL multiplied by 32. This is done by putting it in H (equivalent
+; to shift it 8 bits left) and then rotating right 3 times (5 bits shift left).
 	ld	hl, 0
-calc_row:
-	xor	a
-	or c
-	jr	z, row_done
-	ld	a, l
-	add	a, 32
-	ld	l, a
-	ld	a, h
-	adc	a, 0
-	ld	h, a
-	dec	c
-	jr	calc_row
-row_done:
+	ld	h, c
+	srl	h
+	rr	l
+	srl	h
+	rr	l
+	srl	h
+	rr	l
+
+; Now just add the column in B to HL
 	ld	c, b
 	ld	b, 0
 	add	hl, bc
