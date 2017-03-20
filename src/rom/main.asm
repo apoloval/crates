@@ -36,6 +36,7 @@ include "menu.asm"
 include "graphics.asm"
 include "graphics-data.asm"
 include "controls.asm"
+include "time.asm"
 
 org 0xbfff
 ending db 0

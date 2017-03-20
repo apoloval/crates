@@ -27,7 +27,21 @@ init_screen:
 endp
 
 ; --------------------------------------------------------------------------- ;
+; Clears the screen, setting all the char map bytes to zero.
+; (regs) all
+; --------------------------------------------------------------------------- ;
+proc
+clear_screen:
+	ld	hl, NAMTBL
+	ld	bc, 768
+	xor	a
+	call	FILVRM
+	ret
+endp
+
+; --------------------------------------------------------------------------- ;
 ; Loads the graphic data (char patterns & colors) in VRAM
+; (regs) all
 ; --------------------------------------------------------------------------- ;
 proc
 load_graphics:
@@ -69,109 +83,10 @@ load_graphics:
 	ld	bc, 32*8*8
 	call	LDIRVM
 
-; Clear the name table
-	ld	hl, NAMTBL
-	ld	bc, 768
-	xor	a
-	call	FILVRM
-
-; Done, enable screen & return
+; Done, clear, enable screen & return
+	call	clear_screen
 	call	ENASCR
 	ret
-endp
-
-; --------------------------------------------------------------------------- ;
-; Display the main menu graphics
-; --------------------------------------------------------------------------- ;
-proc
-display_menu:
-	local title, opt1, opt2, opt3
-
-	ld	hl, title
-	ld	bc, 0x0c04
-	call	print_string
-
-	ld	hl, opt1
-	ld	bc, 0x0607
-	call	print_string
-
-	ld	hl, opt2
-	ld	bc, 0x0608
-	call	print_string
-
-	ld	hl, opt3
-	ld	bc, 0x0609
-	call	print_string
-
-	ld	de, 0x0000
-	ld	a, 30
-	call	print_brick_hline
-
-	ld	de, 0x0016
-	ld	a, 30
-	call	print_brick_hline
-
-	ld	de, 0x0002
-	ld	a, 22
-	call	print_brick_vline
-
-	ld	de, 0x1e02
-	ld	a, 22
-	call	print_brick_vline
-
-	ld	de, 0x020c
-	ld	a, 28
-	call	print_brick_hline
-
-	ld	a, 0
-	call	display_main_menu_msg
-
-	ret
-
-title: 	db 7, "CRATES!"
-opt1: 	db 7, "1 START"
-opt2:	db 18, "2 ENTER LEVEL CODE"
-opt3: 	db 15, "3 REDEFINE KEYS"
-endp
-
-; --------------------------------------------------------------------------- ;
-; Display a message in the main menu
-; (in) a: the message to be shown, one of
-;     0 -> "select an option"
-;     1 -> "enter move left key"
-; --------------------------------------------------------------------------- ;
-proc
-display_main_menu_msg:
-	local switch, case_0, case_1, break
-	local select_opt, enter_left
-	sla	a
-	ld	hl, switch
-	ld	b, 0
-	ld	c, a
-	add	hl, bc
-	jp	(hl)
-
-switch:
-	jr	case_0
-	jr	case_1
-
-case_0:
-	ld	hl, select_opt
-	jr	break
-case_1:
-	ld	hl, enter_left
-	jr	break
-
-break:
-	ld	bc, 0x0611
-	call	print_string
-
-	ret
-
-select_opt:
-	db 16, "SELECT AN OPTION"
-enter_left:
-	db 19, "ENTER MOVE LEFT KEY"
 endp
 
 ; --------------------------------------------------------------------------- ;
@@ -198,6 +113,30 @@ print_string:
 	pop	bc
 	pop	hl
 	call	LDIRVM
+	ret
+endp
+
+; --------------------------------------------------------------------------- ;
+; Clear a line of the screen
+; (in) A	the length of the line to be clear
+; (in) B	the column of the line to clear
+; (in) C	the row of the line to clear
+; (regs) all
+; --------------------------------------------------------------------------- ;
+proc
+clear_line:
+	call	buffer_offset
+	ld	bc, NAMTBL
+	add	hl, bc
+
+; Extend input in A to 16-bits in BC
+	ld	b, 0
+	ld	c, a
+
+; Symbol to use while filling VRAM is 0
+	xor	a
+
+	call	FILVRM
 	ret
 endp
 
@@ -283,7 +222,7 @@ endp
 ; (in) b	the column coordinate
 ; (in) c	the row coordinate
 ; (out) hl	the buffer offset
-; (regs) all
+; (regs) hl, bc
 ; --------------------------------------------------------------------------- ;
 proc
 buffer_offset:

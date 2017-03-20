@@ -33,5 +33,6 @@ include "menu.asm"
 include "graphics.asm"
 include "graphics-data.asm"
 include "controls.asm"
+include "time.asm"
 
 main_end:

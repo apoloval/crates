@@ -18,19 +18,80 @@ run_menu:
 	local sel_opt, redefine_keys
 
 	call	display_menu
+
 sel_opt:
+; Show the main menu options
+	ld	hl, title
+	ld	bc, 0x0c08
+	call	print_string
+	ld	hl, opt1
+	ld	bc, 0x060a
+	call	print_string
+	ld	hl, opt2
+	ld	bc, 0x060b
+	call	print_string
+	ld	hl, opt3
+	ld	bc, 0x060c
+	call	print_string
+
+; Select an option from the main menu
 	call	scan_key_pressed
 	jr	z, sel_opt
 	cp	1
-	ret	z
+	jr	z, sel_opt
 	cp	2
-	ret	z
+	jr	z, sel_opt
 	cp	3
 	jr	z, redefine_keys
 	jr	sel_opt
 redefine_keys:
-	ld	a, 1
-	call	display_main_menu_msg
+	call	display_menu
 
-	jr	sel_opt
+	ld	hl, opt3_title
+	ld	bc, 0x0608
+	call	print_string
+
+	ld	hl, enter_left
+	ld	bc, 0x060a
+	call	print_string
+
+	ld	bc, 1000
+	call	wait_millis
+
+	jr	run_menu
+
+title: 	db 07, "CRATES!"
+opt1: 	db 07, "1 START"
+opt2:	db 18, "2 ENTER LEVEL CODE"
+opt3: 	db 15, "3 REDEFINE KEYS"
+opt3_title:
+	db 13, "REDEFINE KEYS"
+enter_left:
+	db 19, "ENTER MOVE LEFT KEY"
+endp
+
+; --------------------------------------------------------------------------- ;
+; Display the main menu graphics
+; --------------------------------------------------------------------------- ;
+proc
+display_menu:
+	call	clear_screen
+
+	ld	de, 0x0000
+	ld	a, 30
+	call	print_brick_hline
+
+	ld	de, 0x0016
+	ld	a, 30
+	call	print_brick_hline
+
+	ld	de, 0x0002
+	ld	a, 22
+	call	print_brick_vline
+
+	ld	de, 0x1e02
+	ld	a, 22
+	call	print_brick_vline
+
+	ret
 endp
