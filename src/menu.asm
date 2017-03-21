@@ -85,7 +85,7 @@ enter_left:
 	ld	de, 10*32+21
 	call	print_scancode
 
-	ld	bc, 1000
+	ld	bc, 500
 	call	wait_millis
 
 ; Read the right key
@@ -99,7 +99,7 @@ enter_right:
 	ld	de, 10*32+22
 	call	print_scancode
 
-	ld	bc, 1000
+	ld	bc, 500
 	call	wait_millis
 
 ; Read the up key
@@ -113,7 +113,7 @@ enter_up:
 	ld	de, 10*32+19
 	call	print_scancode
 
-	ld	bc, 1000
+	ld	bc, 500
 	call	wait_millis
 
 ; Read the down key
@@ -127,7 +127,7 @@ enter_down:
 	ld	de, 10*32+21
 	call	print_scancode
 
-	ld	bc, 1000
+	ld	bc, 500
 	call	wait_millis
 
 	ret
