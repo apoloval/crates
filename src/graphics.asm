@@ -91,27 +91,20 @@ endp
 
 ; --------------------------------------------------------------------------- ;
 ; Display the given size-prefixed string at given location
-; (in) hl	the memory location of the size-prefixed string
-; (in) b	the column where string is printed
-; (in) c	the row where string is printed
+; (in) HL	the memory location of the size-prefixed string
+; (in) DE	the offset in the tiles matrix to print the string into
 ; (regs) all
 ; --------------------------------------------------------------------------- ;
 proc
 print_string:
 	ld	a, (hl)
 	inc	hl
-	push	hl
-	ld	h, 0
-	ld	l, a
-	push	hl
-
-	call	buffer_offset
+	ex	de, hl
 	ld	bc, NAMTBL
 	add	hl, bc
-
 	ex	de, hl
-	pop	bc
-	pop	hl
+	ld	b, 0
+	ld	c, a
 	call	LDIRVM
 	ret
 endp
@@ -119,24 +112,18 @@ endp
 ; --------------------------------------------------------------------------- ;
 ; Clear a line of the screen
 ; (in) A	the length of the line to be clear
-; (in) B	the column of the line to clear
-; (in) C	the row of the line to clear
+; (in) DE	the offset in the tiles matrix to be cleared
 ; (regs) all
 ; --------------------------------------------------------------------------- ;
 proc
 clear_line:
-	call	buffer_offset
-	ld	bc, NAMTBL
-	add	hl, bc
-
-; Extend input in A to 16-bits in BC
+	ld	hl, NAMTBL
+	add	hl, de
 	ld	b, 0
 	ld	c, a
-
-; Symbol to use while filling VRAM is 0
-	xor	a
-
+	xor	a ; Symbol to use while filling VRAM is 0
 	call	FILVRM
+
 	ret
 endp
 
@@ -144,28 +131,23 @@ endp
 ;-----------------------------------------------------------------------------;
 ; Print the scancode symbol in screen
 ; (in) A	the scan code to be printed
-; (in) B	the column where symbol will be printed
-; (in) C	the row where symbol will be printed
+; (in) DE	the offset in the tiles matrix to print the scancode
 ; (regs) all
 ;-----------------------------------------------------------------------------;
 proc
 print_scancode:
 	local symbols
-; Calculate the offset in `symbols` for the scan code and push
+; Calculate the offset in `symbols` for the scan code
 	ld	hl, symbols
-	ld	d, 0
-	ld	e, a
-	add	hl, de
-	push	hl
+	ld	b, 0
+	ld	c, a
+	add	hl, bc
+	ld	a, (hl)
 
-	call	buffer_offset
-	ld	de, NAMTBL
+	ld	hl, NAMTBL
 	add	hl, de
-	ex	de, hl
 
-	ld	bc, 1
-	pop	hl
-	call	LDIRVM
+	call	WRTVRM
 
 	ret
 symbols:
@@ -185,20 +167,18 @@ endp
 
 ; --------------------------------------------------------------------------- ;
 ; Print bricks in the given location
-; (in)  b: the column where brick is printed
-; (in)  c: the row where brick is printed
-; (regs) all
+; (in) DE	the offset in the tiles matrix to print the brick
+; (regs) AF, HL, BC
 ; --------------------------------------------------------------------------- ;
 proc
 print_bricks:
-	call	buffer_offset
-	ld	bc, NAMTBL
-	add	hl, bc
+	ld	hl, NAMTBL
+	add	hl, de
 
 	ld	a, TILE_BRICK0
 	call	WRTVRM
 
-	inc hl
+	inc	hl
 	ld	a, TILE_BRICK1
 	call	WRTVRM
 
@@ -207,7 +187,7 @@ print_bricks:
 	ld	a, TILE_BRICK3
 	call	WRTVRM
 
-	inc hl
+	inc	hl
 	ld	a, TILE_BRICK2
 	call	WRTVRM
 
@@ -216,75 +196,22 @@ endp
 
 ; --------------------------------------------------------------------------- ;
 ; Print a horizontal line of bricks
-; (in)  d: the column where brick line starts
-; (in)  e: the row where brick line is printed
-; (in)  a: the column where brick line ends
+; (in)  DE	the offset in the tiles matrix to print the brick
+; (in)  A	the number of bricks to be printed
 ; --------------------------------------------------------------------------- ;
 proc
 print_brick_hline:
 	local loop
+	sra	a
 loop:
-	ld	b, a
-	ld	c, e
 	push	af
-	push	de
 	call	print_bricks
-	pop	de
 	pop	af
-	cp	d
+	dec	a
 	ret	z
-	sub	2
+	inc	de
+	inc	de
 	jr	loop
-endp
-
-; --------------------------------------------------------------------------- ;
-; Print a vertical line of bricks
-; (in)  d: the column where brick line is printed
-; (in)  e: the row where brick line starts
-; (in)  a: the row where brick line ends
-; --------------------------------------------------------------------------- ;
-proc
-print_brick_vline:
-	local loop
-loop:
-	ld	b, d
-	ld	c, a
-	push	af
-	push	de
-	call	print_bricks
-	pop	de
-	pop	af
-	cp	e
-	ret	z
-	sub	2
-	jr	loop
-endp
-
-; --------------------------------------------------------------------------- ;
-; Compute the memory offset in a buffer for a column and row tuple
-; (in) b	the column coordinate
-; (in) c	the row coordinate
-; (out) hl	the buffer offset
-; (regs) hl, bc
-; --------------------------------------------------------------------------- ;
-proc
-buffer_offset:
-; Put C in HL multiplied by 32. This is done by putting it in H (equivalent
-; to shift it 8 bits left) and then rotating right 3 times (5 bits shift left).
-	ld	hl, 0
-	ld	h, c
-	srl	h
-	rr	l
-	srl	h
-	rr	l
-	srl	h
-	rr	l
-
-; Now just add the column in B to HL
-	ld	c, b
-	ld	b, 0
-	add	hl, bc
-	ret
 endp
 
 TILE_BRICK0 equ 0x01

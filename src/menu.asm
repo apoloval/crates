@@ -25,16 +25,16 @@ show_opts:
 	call	clear_options
 
 	ld	hl, title
-	ld	bc, 0x0c08
+	ld	de, 8*32+12
 	call	print_string
 	ld	hl, opt1
-	ld	bc, 0x060a
+	ld	de, 10*32+6
 	call	print_string
 	ld	hl, opt2
-	ld	bc, 0x060b
+	ld	de, 11*32+6
 	call	print_string
 	ld	hl, opt3
-	ld	bc, 0x060c
+	ld	de, 12*32+6
 	call	print_string
 
 sel_opt:
@@ -71,18 +71,18 @@ redefine_keys:
 
 	call	clear_options
 	ld	hl, title
-	ld	bc, 0x0908
+	ld	de, 8*32+9
 	call	print_string
 
 ; Read the left key
 	ld	hl, enter_left_msg
-	ld	bc, 0x060a
+	ld	de, 10*32+6
 	call	print_string
 enter_left:
 	call	scan_key_pressed
 	jr	z, enter_left
 	ld	(KEYS_LEFT), a
-	ld	bc, 0x150a
+	ld	de, 10*32+21
 	call	print_scancode
 
 	ld	bc, 1000
@@ -90,13 +90,13 @@ enter_left:
 
 ; Read the right key
 	ld	hl, enter_right_msg
-	ld	bc, 0x060a
+	ld	de, 10*32+6
 	call	print_string
 enter_right:
 	call	scan_key_pressed
 	jr	z, enter_right
 	ld	(KEYS_RIGHT), a
-	ld	bc, 0x160a
+	ld	de, 10*32+22
 	call	print_scancode
 
 	ld	bc, 1000
@@ -104,13 +104,13 @@ enter_right:
 
 ; Read the up key
 	ld	hl, enter_up_msg
-	ld	bc, 0x060a
+	ld	de, 10*32+6
 	call	print_string
 enter_up:
 	call	scan_key_pressed
 	jr	z, enter_up
 	ld	(KEYS_UP), a
-	ld	bc, 0x130a
+	ld	de, 10*32+19
 	call	print_scancode
 
 	ld	bc, 1000
@@ -118,13 +118,13 @@ enter_up:
 
 ; Read the down key
 	ld	hl, enter_down_msg
-	ld	bc, 0x060a
+	ld	de, 10*32+6
 	call	print_string
 enter_down:
 	call	scan_key_pressed
 	jr	z, enter_down
 	ld	(KEYS_DOWN), a
-	ld	bc, 0x150a
+	ld	de, 10*32+21
 	call	print_scancode
 
 	ld	bc, 1000
@@ -150,21 +150,13 @@ proc
 display_menu:
 	call	clear_screen
 
-	ld	de, 0x0000
-	ld	a, 30
+	ld	de, 0*32+0
+	ld	a, 32
 	call	print_brick_hline
 
-	ld	de, 0x0016
-	ld	a, 30
+	ld	de, 22*32+0
+	ld	a, 32
 	call	print_brick_hline
-
-	ld	de, 0x0002
-	ld	a, 22
-	call	print_brick_vline
-
-	ld	de, 0x1e02
-	ld	a, 22
-	call	print_brick_vline
 
 	ret
 endp
@@ -175,16 +167,16 @@ endp
 proc
 clear_options:
 	ld	a, 28
-	ld	bc, 0x0208
+	ld	de, 8*32+2
 	call	clear_line
 	ld	a, 28
-	ld	bc, 0x020a
+	ld	de, 10*32+2
 	call	clear_line
 	ld	a, 28
-	ld	bc, 0x020b
+	ld	de, 11*32+2
 	call	clear_line
 	ld	a, 28
-	ld	bc, 0x020c
+	ld	de, 12*32+2
 	call	clear_line
 	ret
 endp
